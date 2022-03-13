@@ -6,7 +6,14 @@ import app from './app.js';
 // import debug  from 'debug' ('server-scripts:server');
 import debug from 'debug';
 import http from 'http';
-import dotenv from 'dotenv'
+import dotenv from 'dotenv';
+import path from 'path';
+import { pathExistsSync } from 'path-exists';
+
+let __dirname = path.dirname(new URL(import.meta.url).pathname);
+__dirname = process.platform === 'win32' ? __dirname.slice(1) : __dirname;
+
+preParse();
 
 /**
  * Get port from environment and store in Express.
@@ -84,16 +91,14 @@ function onListening() {
   console.log('监听端口：', bind);
 }
 
-async function preParse() {
-  const dotenvPath = path.resolve(__dirname, '../.env');
-  if (pathExists(dotenvPath)) {
+function preParse() {
+  const dotenvPath = path.resolve(__dirname, '../../.env');
+  console.log('dotenvPath:', dotenvPath);
+  debugger;
+  if (pathExistsSync(dotenvPath)) {
     dotenv.config({ path: dotenvPath });
     return true;
   } else {
-    console.log(
-      'env 配置文件未填写，请在 https://portal.qiniu.com/user/key 将 Access/Secret Key 复制到项目 .env 文件下后再进行重试'
-    );
-    await copy(`${fromPath}/.env`, `../.env`);
-    return false;
+    throw new Error('env 配置文件未填写，请在 .env 文件中配置 blog 项目的目录地址');
   }
 }
