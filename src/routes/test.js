@@ -1,7 +1,11 @@
+import crypto from 'crypto';
 import path from 'path';
 import { exec } from '../utils/exec.js';
 
-let __dirname = path.dirname(new URL(import.meta.url).pathname);
-__dirname = process.platform === 'win32' ? __dirname.slice(1) : __dirname;
+let algorithm = 'sha1',
+  secret = 'github_blog_push_action';
+const hmac = crypto.createHmac(algorithm, secret);
 
-exec('ls', { cwd: path.resolve(__dirname, '../app'), stdio: 'inherit' });
+hmac.update(Buffer('ca85e020-a2be-11ec-8a25-f0713ffbcb0'), 'utf-8');
+algorithm + '=' + hmac.digest('hex');
+console.log('algorithm:', algorithm);

@@ -94,7 +94,7 @@ function onListening() {
 function preParse() {
   const dotenvPath = path.resolve(__dirname, '../../.env');
   console.log('dotenvPath:', dotenvPath);
-  debugger;
+  // debugger;
   if (pathExistsSync(dotenvPath)) {
     dotenv.config({ path: dotenvPath });
     return true;

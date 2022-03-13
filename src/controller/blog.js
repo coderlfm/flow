@@ -1,31 +1,27 @@
-import createHandler from 'github-webhook-handler';
 import { pull } from '../utils/pull.js';
+import { exec } from '../utils/exec.js';
+import parseSecret from '../utils/parse-secret.js';
 
-const blogHandler = createHandler({ path: '/webhook', secret: 'github bog push action' });
+const secret = 'github_blog_push_action';
 
 // 处理自动化构建blog
-export default function (req, res) {
-  blogHandler(req, res, function (err) {
-    res.statusCode = 404;
-    res.end('no such location');
-  });
+export default async function (req, res) {
+  if (!parseSecret(req.headers['x-hub-signature'], secret, req.body)) {
+    res.status(400).json({ msg: 'secret 校验失败' });
+  }
 
-  blogHandler.on('push', async function (event) {
-    await publish();
+  console.log('开始构建');
 
-    res.json({ msg: '构建成功~', code: 0 });
-
-    console.log('Received a push event for %s to %s', event.payload.repository.name, event.payload.ref);
-  });
+  setTimeout(publish, 0);
+  res.json({ msg: '构建成功~', code: 0 });
 }
 
 async function publish() {
-  try {
-    // 0:成功 1:失败
-    const result = await pull(process.env.BLOG_DIR);
-    if (result) await publish();
-  } catch (error) {
-    console.log('拉取代码错误', error);
-  }
-  await exec('pnpm run publish', { cwd: process.env.BLOG_DIR });
+  // 0:成功 1:失败
+  const result = await pull(process.env.BLOG_DIR);
+  console.log('git pull: ', result ? '失败' : '成功');
+  if (result) await publish();
+
+  const res = await exec('pnpm run publish', { cwd: process.env.BLOG_DIR, stdio: 'inherit' });
+  console.log('publish 结果:', res);
 }
