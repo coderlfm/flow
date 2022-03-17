@@ -17,10 +17,12 @@ export default async function (req, res) {
 }
 
 async function publish() {
+  console.log('git pull ......');
+
   // 0:成功 1:失败
   const result = await pull(process.env.BLOG_DIR);
   console.log('git pull: ', result ? '失败' : '成功');
-  if (result) await publish();
+  if (result) return await publish();
 
   const res = await exec('pnpm run publish', { cwd: process.env.BLOG_DIR, stdio: 'inherit' });
   console.log('publish 结果:', res);
