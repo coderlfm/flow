@@ -6,12 +6,7 @@ import app from './app.js';
 // import debug  from 'debug' ('server-scripts:server');
 import debug from 'debug';
 import http from 'http';
-import dotenv from 'dotenv';
-import path from 'path';
-import { pathExistsSync } from 'path-exists';
-
-let __dirname = path.dirname(new URL(import.meta.url).pathname);
-__dirname = process.platform === 'win32' ? __dirname.slice(1) : __dirname;
+import preParse from '../utils/pre-parse.js';
 
 preParse();
 
@@ -89,16 +84,4 @@ function onListening() {
   var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
   debug('Listening on ' + bind);
   console.log('监听端口：', bind);
-}
-
-function preParse() {
-  const dotenvPath = path.resolve(__dirname, '../../.env');
-  console.log('dotenvPath:', dotenvPath);
-  // debugger;
-  if (pathExistsSync(dotenvPath)) {
-    dotenv.config({ path: dotenvPath });
-    return true;
-  } else {
-    throw new Error('env 配置文件未填写，请在 .env 文件中配置 blog 项目的目录地址');
-  }
 }

@@ -2,9 +2,6 @@ import path from 'path';
 import express from 'express';
 import blogContrller from '../controller/blog.js';
 
-let __dirname = path.dirname(new URL(import.meta.url).pathname);
-__dirname = process.platform === 'win32' ? __dirname.slice(1) : __dirname;
-
 const app = express();
 
 app.get('/', function (req, res) {
